@@ -339,7 +339,7 @@ module.exports = function(grunt) {
     grunt.task.run('env:fh');
 
     if (this.target === 'dist') {
-      grunt.task.run(['clean:fh-dist', 'shell:fh-nsp', 'fh:make-version-file', 'copy:fh-dist']);
+      grunt.task.run(['clean:fh-dist', 'fh:make-version-file', 'copy:fh-dist']);
 
       if (checkPlaceholderFileExists()) {
         grunt.task.run('fh-generate-dockerised-config');
