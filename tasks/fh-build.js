@@ -294,7 +294,7 @@ module.exports = function(grunt) {
         }
       },
       'fh-nsp': {
-        command: 'PATH=node_modules/.bin:node_modules/grunt-fh-build/node_modules/.bin:$PATH nsp audit-shrinkwrap'
+        command: 'PATH=node_modules/.bin:node_modules/grunt-fh-build/node_modules/.bin:$PATH nsp check'
       }
     }
   });
