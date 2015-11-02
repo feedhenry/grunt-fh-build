@@ -294,7 +294,7 @@ module.exports = function(grunt) {
         }
       },
       'fh-nsp': {
-        command: 'PATH=node_modules/.bin:node_modules/grunt-fh-build/node_modules/.bin:$PATH nsp audit-shrinkwrap'
+        command: 'PATH=node_modules/.bin:node_modules/grunt-fh-build/node_modules/.bin:$PATH nsp check'
       }
     }
   });
@@ -339,7 +339,7 @@ module.exports = function(grunt) {
     grunt.task.run('env:fh');
 
     if (this.target === 'dist') {
-      grunt.task.run(['clean:fh-dist', 'shell:fh-nsp', 'fh:make-version-file', 'copy:fh-dist']);
+      grunt.task.run(['clean:fh-dist', 'fh:make-version-file', 'copy:fh-dist']);
 
       if (checkPlaceholderFileExists()) {
         grunt.task.run('fh-generate-dockerised-config');
