@@ -1,3 +1,6 @@
+## 0.3.4 - 2015-12-23 - Wojciech Trocki
+- Removed code coverage from default grunt job.
+
 ## 0.3.3 - 2015-12-23 - Leigh Griffin
 - Updated package.JSON to include Istanbul as a Dev dependency 
 
