@@ -1,7 +1,7 @@
 {
   "name": "grunt-fh-build",
   "description": "A plugin for development and build lifecycle of FeedHenry components",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "homepage": "https://github.com/feedhenry/grunt-fh-build",
   "author": "Red Hat",
   "license": "Apache-2.0",
@@ -19,7 +19,6 @@
     "test": "grunt test"
   },
   "devDependencies": {
-    "istanbul": "^0.3.13",
     "grunt": "~0.4.5"
   },
   "peerDependencies": {
@@ -30,6 +29,7 @@
   ],
   "dependencies": {
     "findup-sync": "^0.2.1",
+    "istanbul": "^0.4.1",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-compress": "^0.13.0",
     "grunt-contrib-copy": "^0.8.0",
