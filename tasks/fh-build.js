@@ -381,7 +381,7 @@ module.exports = function(grunt) {
     } else if (this.target === 'shrinkwrap') {
       grunt.task.run(['shell:fh-run-array:fhshrinkwrap']);
     } else if (this.target === 'default') {
-      grunt.task.run(['jshint', 'fh:coverage', 'fh:analysis', 'fh:dist']);
+      grunt.task.run(['jshint', 'fh:test', 'fh:dist']);
     } else {
       grunt.fail.warn('Unknown target provided to `grunt fh`');
     }

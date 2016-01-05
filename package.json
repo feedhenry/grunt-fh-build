@@ -1,7 +1,7 @@
 {
   "name": "grunt-fh-build",
   "description": "A plugin for development and build lifecycle of FeedHenry components",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "homepage": "https://github.com/feedhenry/grunt-fh-build",
   "author": "Red Hat",
   "license": "Apache-2.0",
