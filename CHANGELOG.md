@@ -1,3 +1,6 @@
+## 0.4.0 - 2016-01-05 - Wojciech Trocki
+- Added support for running single test cases.
+
 ## 0.3.4 - 2015-12-23 - Wojciech Trocki
 - Removed code coverage from default grunt job.
 

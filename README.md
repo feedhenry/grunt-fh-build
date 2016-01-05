@@ -68,6 +68,21 @@ Note: by default, the directory `node_modules/.bin` will be added to the
 beginning of the `PATH` environment variable, so we don't have to specify the
 path to commands, if they reside in that directory.
 
+### fh:testfile
+This target will run the single unit test file for the project. To configure which and how
+tests are run, add a property called `unit_single` to the configuration in your
+Gruntfile.js. Command string should contain `test_filename` placeholder 
+that will be replaced with filename argument at runtime. Additional parameters are supported by specifying
+`unit_test_param1` where 1 is number of parameter after filename.
+This property is an array of commands to run, so that different test runners can be used per project.
+Example for mocha framework with support for running single test method.
+
+    unit_single: ['mocha -A -u exports ./test/helper.js ./test/unit/**/<%= unit_test_filename %> --grep=<%= unit_test_param1 %>''],
+    
+Example:
+
+    grunt fh:testfile:testfile.js
+
 ### fh:integrate
 This target works the same as the `fh:unit` one above, with the exception that
 the property specifying the commands to run will be called `integrate`.
