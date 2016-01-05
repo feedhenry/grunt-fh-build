@@ -201,6 +201,7 @@ module.exports = function(grunt) {
       default: {},
       analysis: {},
       coverage: {},
+      testfile: {},
       integrate: {},
       shrinkwrap: {},
       'make-version-file': {}
@@ -314,6 +315,27 @@ module.exports = function(grunt) {
     }
   };
 
+  var runTestsForSingleFile = function(args){
+    var testFile = args[0];
+    if (!testFile){
+      grunt.log.errorlns("Please specify test file to run: grunt fh:testfile:filename.js");
+      return;
+    }
+    // Task name (grunt file config variable)
+    var testType = "unit_single";
+    // Task filename parameter (used as template in runtime script)
+    grunt.config.set("unit_test_filename", testFile);
+    for (var index = 1; index < args.length; index++){
+      grunt.config.set("unit_test_param" + index, args[index]);
+    }
+    var cmdArray = grunt.config.get(testType);
+    if (!cmdArray){
+      grunt.log.errorlns("No local config for single tests. Please define " + testType + " property in config.");
+      return;
+    }
+    grunt.task.run(['shell:fh-run-array:' + testType]);
+  }
+
   grunt.registerTask('fh-generate-dockerised-config','Task to generate openshift config file', function() {
     var conf = require(path.resolve('config/dev.json'));
     var placeholders = require(path.resolve('config/ose-placeholders.js'));
@@ -366,6 +388,8 @@ module.exports = function(grunt) {
                       'shell:fh-run-array:accept']);
     } else if (this.target === 'unit') {
       grunt.task.run(['shell:fh-run-array:unit']);
+    } else if (this.target === 'testfile'){
+      runTestsForSingleFile(arguments);
     } else if (this.target === 'integrate') {
       grunt.task.run(['shell:fh-run-array:integrate']);
     } else if (this.target === 'accept') {
