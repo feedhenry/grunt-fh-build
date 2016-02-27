@@ -154,12 +154,14 @@ module.exports = function(grunt) {
           archive: 'dist/<%= fhpkg.name %>-<%= fhbuildver %>.tar.gz'
         },
         files: [
-          { // Everything except exclusions
+          {
+            // Everything except exclusions
             expand: true,
             src: mergePatterns(false),
             dest: '<%= fhpkg.name %>-<%= fhbuildver %>'
           },
-          { // Files that are processed
+          {
+            // Files that are processed
             expand: true,
             cwd: 'output/<%= fhbuildver %>/',
             src: ['*'],
@@ -174,12 +176,14 @@ module.exports = function(grunt) {
             + process.arch + '.tar.gz'
         },
         files: [
-          { // Everything except exclusions
+          {
+            // Everything except exclusions
             expand: 'true',
             src: mergePatterns(true),
             dest: '<%= fhpkg.name %>-<%= fhbuildver %>-<%= fhos %>.' + process.arch
           },
-          { // Files that are processed
+          {
+            // Files that are processed
             expand: true,
             cwd: 'output/<%= fhbuildver %>/',
             src: ['*'],
@@ -254,7 +258,9 @@ module.exports = function(grunt) {
         command: 'python -c "import platform; print platform.linux_distribution()"',
         options: {
           callback: function(err, stdout, stderr, cb) {
-            if (err) throw err;
+            if (err) {
+              throw err;
+            }
 
             var dvi = stdout.toLowerCase().split("'").filter(function(v) {
               return v !== '(' && v !== ', ' && v !== ')';
@@ -302,22 +308,19 @@ module.exports = function(grunt) {
 
 
   var checkPlaceholderFileExists = function() {
-    var placeholders;
-    // check to see if the placeholder file file exists
-    // if it does create the openshift config file
     try {
-      placeholders = require(path.resolve('config/ose-placeholders.js'));
+      require(path.resolve('config/ose-placeholders.js'));
       return true;
     }
-    catch(exception) {
+    catch (exception) {
       grunt.log.debug('No placeholder file found for openshift 3 - continuing normally');
       return false;
     }
   };
 
-  var runTestsForSingleFile = function(args){
+  var runTestsForSingleFile = function (args) {
     var testFile = args[0];
-    if (!testFile){
+    if (!testFile) {
       grunt.log.errorlns("Please specify test file to run: grunt fh:testfile:filename.js");
       return;
     }
@@ -325,16 +328,16 @@ module.exports = function(grunt) {
     var testType = "unit_single";
     // Task filename parameter (used as template in runtime script)
     grunt.config.set("unit_test_filename", testFile);
-    for (var index = 1; index < args.length; index++){
+    for (var index = 1; index < args.length; index++) {
       grunt.config.set("unit_test_param" + index, args[index]);
     }
     var cmdArray = grunt.config.get(testType);
-    if (!cmdArray){
+    if (!cmdArray) {
       grunt.log.errorlns("No local config for single tests. Please define " + testType + " property in config.");
       return;
     }
     grunt.task.run(['shell:fh-run-array:' + testType]);
-  }
+  };
 
   grunt.registerTask('fh-generate-dockerised-config','Task to generate openshift config file', function() {
     var conf = require(path.resolve('config/dev.json'));
