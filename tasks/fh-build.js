@@ -72,7 +72,9 @@ module.exports = function(grunt) {
     var fhignore = grunt.config.get('fhignore');
     var extras = [];
     if (typeof fhignore === 'string' && fhignore.length > 0) {
-      extras = fhignore.split(',').map(function(elem) { return '!' + elem; });
+      extras = fhignore.split(',').map(function(elem) {
+        return '!' + elem;
+      });
     }
     Array.prototype.push.apply(patterns, extras);
     var fhinclude = grunt.config.get('fhinclude');
@@ -289,14 +291,13 @@ module.exports = function(grunt) {
     try {
       require(path.resolve('config/ose-placeholders.js'));
       return true;
-    }
-    catch (exception) {
+    } catch (exception) {
       grunt.log.debug('No placeholder file found for openshift 3 - continuing normally');
       return false;
     }
   };
 
-  var runTestsForSingleFile = function (args) {
+  var runTestsForSingleFile = function(args) {
     var testFile = args[0];
     if (!testFile) {
       grunt.log.errorlns("Please specify test file to run: grunt fh:testfile:filename.js");
@@ -369,7 +370,7 @@ module.exports = function(grunt) {
                       'shell:fh-run-array:accept']);
     } else if (this.target === 'unit') {
       grunt.task.run(['shell:fh-run-array:unit']);
-    } else if (this.target === 'testfile'){
+    } else if (this.target === 'testfile') {
       runTestsForSingleFile(arguments);
     } else if (this.target === 'integrate') {
       grunt.task.run(['shell:fh-run-array:integrate']);
