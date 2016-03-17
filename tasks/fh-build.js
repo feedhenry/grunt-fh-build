@@ -99,13 +99,13 @@ module.exports = function(grunt) {
     }
   });
 
+  var lintTarget = grunt.config.get('fhLintTarget') || ['*.js', 'lib/**/*.js', 'bin/**/*.js'];
   grunt.config.merge({
-    jshint: {
+    eslint: {
       options: {
-        jshintrc: '.jshintrc'
+        configFile: '.eslintrc.json'
       },
-
-      fh: ['*.js', 'lib/**/*.js', 'bin/**/*.js']
+      target: lintTarget
     }
   });
 
@@ -205,7 +205,7 @@ module.exports = function(grunt) {
   });
 
   grunt.config.merge({
-    'fhbuildver': '<%=  fhpkg.version.replace("BUILD-NUMBER", fhbuildnum) %>'
+    'fhbuildver': '<%= fhpkg.version.replace("BUILD-NUMBER", fhbuildnum) %>'
   });
 
   grunt.config.merge({
@@ -382,7 +382,7 @@ module.exports = function(grunt) {
         'shell:fh-report-cov:lcov', 'shell:fh-report-cov:cobertura'
       ]);
     } else if (this.target === 'default') {
-      grunt.task.run(['jshint', 'fh:test', 'fh:dist']);
+      grunt.task.run(['eslint', 'fh:test', 'fh:dist']);
     } else {
       grunt.fail.warn('Unknown target provided to `grunt fh`');
     }

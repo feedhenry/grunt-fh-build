@@ -35,6 +35,7 @@
     "grunt-contrib-jshint": "^1.0.0",
     "grunt-contrib-nodeunit": "^1.0.0",
     "grunt-env": "^0.4.4",
+    "grunt-eslint": "^18.0.0",
     "grunt-shell": "^1.1.2",
     "istanbul": "^0.4.3",
     "lodash": "^4.8.2",
