@@ -17,6 +17,7 @@ var path = require('path');
 var _ = require('underscore');
 var fs = require('fs');
 var _ld = require('lodash');
+var findup = require('findup-sync');
 
 
 module.exports = function(grunt) {
@@ -98,12 +99,10 @@ module.exports = function(grunt) {
     }
   });
 
+  var lintTargets = ['*.js', 'lib/**/*.js', 'bin/**/*.js'];
   grunt.config.merge({
     eslint: {
-      options: {
-        configFile: '.eslintrc.json'
-      },
-      target: ['*.js', 'lib/**/*.js', 'bin/**/*.js']
+      target: lintTargets
     }
   });
 
