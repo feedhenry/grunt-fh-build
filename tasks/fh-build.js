@@ -24,7 +24,20 @@ module.exports = function(grunt) {
 
   require('time-grunt')(grunt);
 
-  require('load-grunt-tasks')(grunt);
+  var tasksDir;
+  var dependencies = require('../package.json').dependencies;
+  var basepath = path.resolve(__dirname, '..');
+
+  for (var dependency in dependencies) {
+    if (dependency.indexOf('grunt-') === 0) {
+      tasksDir = findup(path.join('node_modules', dependency, 'tasks'),
+                        {cwd: basepath});
+      if (tasksDir) {
+        grunt.loadTasks(tasksDir);
+      }
+    }
+  }
+
   /**
    * If grunt config contains an array property called 'fhignore',
    * its elements will be excluded from the tarball.
