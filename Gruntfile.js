@@ -17,14 +17,14 @@ module.exports = function(grunt) {
   'use strict';
 
   grunt.initConfig({
-    jshint: {
-      all: ['tasks/*.js']
+    eslint: {
+      configFile: '.eslintrc.json'
     }
   });
 
   // Actually load this plugin's task(s).
   grunt.loadTasks('tasks');
 
-  grunt.registerTask('default', ['jshint']);
+  grunt.registerTask('default', ['eslint']);
 
 };

@@ -14,10 +14,10 @@
  limitations under the License.
  */
 var path = require('path');
-var findup = require('findup-sync');
 var _ = require('underscore');
 var fs = require('fs');
 var _ld = require('lodash');
+var findup = require('findup-sync');
 
 
 module.exports = function(grunt) {
@@ -47,7 +47,6 @@ module.exports = function(grunt) {
     var patterns = [
       '**',
       '!dist/**',
-      '!plato/**',
       '!cov-*/**',
       '!test*/**',
       '!config/**',
@@ -73,7 +72,9 @@ module.exports = function(grunt) {
     var fhignore = grunt.template.process('<%= fhignore %>');
     var extras = [];
     if (typeof fhignore === 'string' && fhignore.length > 0) {
-      extras = fhignore.split(',').map(function(elem) { return '!' + elem; });
+      extras = fhignore.split(',').map(function(elem) {
+        return '!' + elem;
+      });
     }
     Array.prototype.push.apply(patterns, extras);
     var fhinclude = grunt.template.process('<%= fhinclude %>');
@@ -100,26 +101,10 @@ module.exports = function(grunt) {
     }
   });
 
+  var lintTargets = ['*.js', 'lib/**/*.js', 'bin/**/*.js'];
   grunt.config.merge({
-    jshint: {
-      options: {
-        jshintrc: '.jshintrc'
-      },
-
-      fh: ['*.js', 'lib/**/*.js', 'bin/**/*.js']
-    }
-  });
-
-  grunt.config.merge({
-    plato: {
-      fh: {
-        options : {
-          jshint : grunt.file.readJSON('.jshintrc')
-        },
-        files: {
-          'plato': ['lib/**/*.js']
-        }
-      }
+    eslint: {
+      target: lintTargets
     }
   });
 
@@ -311,14 +296,13 @@ module.exports = function(grunt) {
     try {
       require(path.resolve('config/ose-placeholders.js'));
       return true;
-    }
-    catch (exception) {
+    } catch (exception) {
       grunt.log.debug('No placeholder file found for openshift 3 - continuing normally');
       return false;
     }
   };
 
-  var runTestsForSingleFile = function (args) {
+  var runTestsForSingleFile = function(args) {
     var testFile = args[0];
     if (!testFile) {
       grunt.log.errorlns("Please specify test file to run: grunt fh:testfile:filename.js");
@@ -391,7 +375,7 @@ module.exports = function(grunt) {
                       'shell:fh-run-array:accept']);
     } else if (this.target === 'unit') {
       grunt.task.run(['shell:fh-run-array:unit']);
-    } else if (this.target === 'testfile'){
+    } else if (this.target === 'testfile') {
       runTestsForSingleFile(arguments);
     } else if (this.target === 'integrate') {
       grunt.task.run(['shell:fh-run-array:integrate']);
@@ -403,12 +387,10 @@ module.exports = function(grunt) {
         'shell:fh-run-array:integrate_cover', 'shell:fh-run-array:accept_cover',
         'shell:fh-report-cov:lcov', 'shell:fh-report-cov:cobertura'
       ]);
-    } else if (this.target === 'analysis') {
-      grunt.task.run(['plato:fh']);
     } else if (this.target === 'shrinkwrap') {
       grunt.task.run(['shell:fh-run-array:fhshrinkwrap']);
     } else if (this.target === 'default') {
-      grunt.task.run(['jshint', 'fh:test', 'fh:dist']);
+      grunt.task.run(['eslint', 'fh:test', 'fh:dist']);
     } else {
       grunt.fail.warn('Unknown target provided to `grunt fh`');
     }
