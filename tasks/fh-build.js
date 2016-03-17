@@ -101,25 +101,11 @@ module.exports = function(grunt) {
   });
 
   grunt.config.merge({
-    jshint: {
+    eslint: {
       options: {
-        jshintrc: '.jshintrc'
+        configFile: '.eslintrc.json'
       },
-
-      fh: ['*.js', 'lib/**/*.js', 'bin/**/*.js']
-    }
-  });
-
-  grunt.config.merge({
-    plato: {
-      fh: {
-        options : {
-          jshint : grunt.file.readJSON('.jshintrc')
-        },
-        files: {
-          'plato': ['lib/**/*.js']
-        }
-      }
+      target: ['*.js', 'lib/**/*.js', 'bin/**/*.js']
     }
   });
 

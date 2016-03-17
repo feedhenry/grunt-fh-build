@@ -17,8 +17,8 @@ module.exports = function(grunt) {
   'use strict';
 
   grunt.initConfig({
-    jshint: {
-      all: ['tasks/*.js']
+    eslint: {
+      configFile: '.eslintrc.json'
     }
   });
 
