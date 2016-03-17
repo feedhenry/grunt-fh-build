@@ -14,7 +14,6 @@
  limitations under the License.
  */
 var path = require('path');
-var findup = require('findup-sync');
 var _ = require('underscore');
 var fs = require('fs');
 var _ld = require('lodash');
@@ -25,7 +24,7 @@ module.exports = function(grunt) {
 
   require('time-grunt')(grunt);
 
-  requre('load-grunt-tasks')(grunt);
+  require('load-grunt-tasks')(grunt);
   /**
    * If grunt config contains an array property called 'fhignore',
    * its elements will be excluded from the tarball.
@@ -34,7 +33,6 @@ module.exports = function(grunt) {
     var patterns = [
       '**',
       '!dist/**',
-      '!plato/**',
       '!cov-*/**',
       '!test*/**',
       '!config/**',
@@ -364,7 +362,7 @@ module.exports = function(grunt) {
                       'shell:fh-run-array:accept']);
     } else if (this.target === 'unit') {
       grunt.task.run(['shell:fh-run-array:unit']);
-    } else if (this.target === 'testfile'){
+    } else if (this.target === 'testfile') {
       runTestsForSingleFile(arguments);
     } else if (this.target === 'integrate') {
       grunt.task.run(['shell:fh-run-array:integrate']);
@@ -376,12 +374,10 @@ module.exports = function(grunt) {
         'shell:fh-run-array:integrate_cover', 'shell:fh-run-array:accept_cover',
         'shell:fh-report-cov:lcov', 'shell:fh-report-cov:cobertura'
       ]);
-    } else if (this.target === 'analysis') {
-      grunt.task.run(['plato:fh']);
     } else if (this.target === 'shrinkwrap') {
       grunt.task.run(['shell:fh-run-array:fhshrinkwrap']);
     } else if (this.target === 'default') {
-      grunt.task.run(['jshint', 'fh:test', 'fh:dist']);
+      grunt.task.run(['eslint', 'fh:test', 'fh:dist']);
     } else {
       grunt.fail.warn('Unknown target provided to `grunt fh`');
     }
