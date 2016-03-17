@@ -72,7 +72,9 @@ module.exports = function(grunt) {
     var fhignore = grunt.template.process('<%= fhignore %>');
     var extras = [];
     if (typeof fhignore === 'string' && fhignore.length > 0) {
-      extras = fhignore.split(',').map(function(elem) { return '!' + elem; });
+      extras = fhignore.split(',').map(function(elem) {
+        return '!' + elem;
+      });
     }
     Array.prototype.push.apply(patterns, extras);
     var fhinclude = grunt.template.process('<%= fhinclude %>');
@@ -294,14 +296,13 @@ module.exports = function(grunt) {
     try {
       require(path.resolve('config/ose-placeholders.js'));
       return true;
-    }
-    catch (exception) {
+    } catch (exception) {
       grunt.log.debug('No placeholder file found for openshift 3 - continuing normally');
       return false;
     }
   };
 
-  var runTestsForSingleFile = function (args) {
+  var runTestsForSingleFile = function(args) {
     var testFile = args[0];
     if (!testFile) {
       grunt.log.errorlns("Please specify test file to run: grunt fh:testfile:filename.js");
