@@ -110,19 +110,6 @@ module.exports = function(grunt) {
   });
 
   grunt.config.merge({
-    plato: {
-      fh: {
-        options : {
-          jshint : grunt.file.readJSON('.jshintrc')
-        },
-        files: {
-          'plato': ['lib/**/*.js']
-        }
-      }
-    }
-  });
-
-  grunt.config.merge({
     clean: {
       'fh-cov': ['coverage', 'lib-cov', 'cov-*'],
       'fh-dist': ['dist', 'output'],
@@ -202,11 +189,9 @@ module.exports = function(grunt) {
       clean: {},
       accept: {},
       default: {},
-      analysis: {},
       coverage: {},
       testfile: {},
       integrate: {},
-      shrinkwrap: {},
       'make-version-file': {}
     }
   });
@@ -221,10 +206,6 @@ module.exports = function(grunt) {
 
   grunt.config.merge({
     'fhbuildver': '<%=  fhpkg.version.replace("BUILD-NUMBER", fhbuildnum) %>'
-  });
-
-  grunt.config.merge({
-    'fhshrinkwrap': ['npm cache clean', 'npm shrinkwrap']
   });
 
   grunt.config.merge({
@@ -400,10 +381,6 @@ module.exports = function(grunt) {
         'shell:fh-run-array:integrate_cover', 'shell:fh-run-array:accept_cover',
         'shell:fh-report-cov:lcov', 'shell:fh-report-cov:cobertura'
       ]);
-    } else if (this.target === 'analysis') {
-      grunt.task.run(['plato:fh']);
-    } else if (this.target === 'shrinkwrap') {
-      grunt.task.run(['shell:fh-run-array:fhshrinkwrap']);
     } else if (this.target === 'default') {
       grunt.task.run(['jshint', 'fh:test', 'fh:dist']);
     } else {
