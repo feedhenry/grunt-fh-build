@@ -70,13 +70,13 @@ module.exports = function(grunt) {
             });
     }
 
-    var fhignore = grunt.template.process('<%= fhignore %>');
+    var fhignore = grunt.config.get('fhignore');
     var extras = [];
     if (typeof fhignore === 'string' && fhignore.length > 0) {
       extras = fhignore.split(',').map(function(elem) { return '!' + elem; });
     }
     Array.prototype.push.apply(patterns, extras);
-    var fhinclude = grunt.template.process('<%= fhinclude %>');
+    var fhinclude = grunt.config.get('fhinclude');
     extras = [];
     if(typeof fhinclude === 'string' && fhinclude.length > 0) {
       extras = fhinclude.split(',');
@@ -139,7 +139,7 @@ module.exports = function(grunt) {
         options: {
           process: function(content) {
             return content.replace(/BUILD\-NUMBER/,
-                                   grunt.template.process('<%= fhbuildnum %>'));
+                                   grunt.config.get('fhbuildnum'));
           }
         }
       }
@@ -276,12 +276,13 @@ module.exports = function(grunt) {
         command: function(test_type) {
           var cmd = '';
 
-          if (test_type) {
-            var cmdsString = grunt.template.process('<%= ' + test_type + ' %>');
+          if (test_type && grunt.config.get(test_type)) {
+            var cmdsString = grunt.config.get(test_type);
             var cmdArray = cmdsString.split(',');
             cmd = cmdArray.join(' && ');
           } else {
-            grunt.warn("Invalid or missing parameter to " + this.nameArgs);
+            grunt.log.warn("Skipping", grunt.task.current.nameArgs,
+                           "-- invalid or missing parameter");
           }
 
           return cmd;

@@ -19,9 +19,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     jshint: {
       all: ['tasks/*.js']
-    },
-    fhignore: [],
-    fhinclude: []
+    }
   });
 
   // Actually load this plugin's task(s).
