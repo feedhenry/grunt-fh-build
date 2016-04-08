@@ -39,7 +39,6 @@
     "grunt-shell": "^1.1.2",
     "istanbul": "^0.4.3",
     "lodash": "^4.8.2",
-    "nsp": "^2.3.0",
     "time-grunt": "^1.1.1",
     "underscore": "^1.8.3"
   }

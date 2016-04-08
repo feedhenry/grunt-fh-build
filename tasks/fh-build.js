@@ -300,9 +300,6 @@ module.exports = function(grunt) {
 
           return cmd;
         }
-      },
-      'fh-nsp': {
-        command: 'PATH=node_modules/.bin:node_modules/grunt-fh-build/node_modules/.bin:$PATH nsp check'
       }
     }
   });
