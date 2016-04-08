@@ -15,9 +15,8 @@
  */
 var path = require('path');
 var findup = require('findup-sync');
-var _ = require('underscore');
+var _ = require('lodash');
 var fs = require('fs');
-var _ld = require('lodash');
 
 
 module.exports = function(grunt) {
@@ -342,9 +341,9 @@ module.exports = function(grunt) {
     var placeholders = require(path.resolve('config/ose-placeholders.js'));
 
     grunt.log.debug('Generating openshift 3 config file');
-    _ld.forOwn(placeholders, function(value, key) {
+    _.forOwn(placeholders, function(value, key) {
       grunt.log.debug('key', key, 'value', value);
-      _ld.set(conf, key, value);
+      _.set(conf, key, value);
     });
     fs.writeFileSync('conf-docker.json', JSON.stringify(conf, true, 2));
     grunt.log.debug('Created file conf-docker.json');
