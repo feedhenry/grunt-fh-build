@@ -17,14 +17,13 @@ module.exports = function(grunt) {
   'use strict';
 
   grunt.initConfig({
-    jshint: {
-      all: ['tasks/*.js']
-    }
+    // fhLintTarget overrides the default eslint target
+    fhLintTarget: ['*.js', 'tasks/**/*.js']
   });
 
   // Actually load this plugin's task(s).
   grunt.loadTasks('tasks');
 
-  grunt.registerTask('default', ['jshint']);
+  grunt.registerTask('default', ['eslint']);
 
 };

@@ -15,9 +15,8 @@
  */
 var path = require('path');
 var findup = require('findup-sync');
-var _ = require('underscore');
+var _ = require('lodash');
 var fs = require('fs');
-var _ld = require('lodash');
 
 
 module.exports = function(grunt) {
@@ -60,6 +59,7 @@ module.exports = function(grunt) {
       '!makefile',
       '!npm-debug.log',
       '!*.sublime-project',
+      '!sonar-project.properties',
       '!**/*.tar.gz'
     ];
     if (bundle_deps) {
@@ -70,13 +70,15 @@ module.exports = function(grunt) {
             });
     }
 
-    var fhignore = grunt.template.process('<%= fhignore %>');
+    var fhignore = grunt.config.get('fhignore');
     var extras = [];
     if (typeof fhignore === 'string' && fhignore.length > 0) {
-      extras = fhignore.split(',').map(function(elem) { return '!' + elem; });
+      extras = fhignore.split(',').map(function(elem) {
+        return '!' + elem;
+      });
     }
     Array.prototype.push.apply(patterns, extras);
-    var fhinclude = grunt.template.process('<%= fhinclude %>');
+    var fhinclude = grunt.config.get('fhinclude');
     extras = [];
     if(typeof fhinclude === 'string' && fhinclude.length > 0) {
       extras = fhinclude.split(',');
@@ -100,26 +102,13 @@ module.exports = function(grunt) {
     }
   });
 
+  var lintTarget = grunt.config.get('fhLintTarget') || ['*.js', 'lib/**/*.js', 'bin/**/*.js'];
   grunt.config.merge({
-    jshint: {
+    eslint: {
       options: {
-        jshintrc: '.jshintrc'
+        configFile: '.eslintrc.json'
       },
-
-      fh: ['*.js', 'lib/**/*.js', 'bin/**/*.js']
-    }
-  });
-
-  grunt.config.merge({
-    plato: {
-      fh: {
-        options : {
-          jshint : grunt.file.readJSON('.jshintrc')
-        },
-        files: {
-          'plato': ['lib/**/*.js']
-        }
-      }
+      target: lintTarget
     }
   });
 
@@ -139,7 +128,7 @@ module.exports = function(grunt) {
         options: {
           process: function(content) {
             return content.replace(/BUILD\-NUMBER/,
-                                   grunt.template.process('<%= fhbuildnum %>'));
+                                   grunt.config.get('fhbuildnum'));
           }
         }
       }
@@ -203,11 +192,9 @@ module.exports = function(grunt) {
       clean: {},
       accept: {},
       default: {},
-      analysis: {},
       coverage: {},
       testfile: {},
       integrate: {},
-      shrinkwrap: {},
       'make-version-file': {}
     }
   });
@@ -221,11 +208,7 @@ module.exports = function(grunt) {
   });
 
   grunt.config.merge({
-    'fhbuildver': '<%=  fhpkg.version.replace("BUILD-NUMBER", fhbuildnum) %>'
-  });
-
-  grunt.config.merge({
-    'fhshrinkwrap': ['npm cache clean', 'npm shrinkwrap']
+    'fhbuildver': '<%= fhpkg.version.replace("BUILD-NUMBER", fhbuildnum) %>'
   });
 
   grunt.config.merge({
@@ -276,12 +259,13 @@ module.exports = function(grunt) {
         command: function(test_type) {
           var cmd = '';
 
-          if (test_type) {
-            var cmdsString = grunt.template.process('<%= ' + test_type + ' %>');
+          if (test_type && grunt.config.get(test_type)) {
+            var cmdsString = grunt.config.get(test_type);
             var cmdArray = cmdsString.split(',');
             cmd = cmdArray.join(' && ');
           } else {
-            grunt.warn("Invalid or missing parameter to " + this.nameArgs);
+            grunt.log.warn("Skipping", grunt.task.current.nameArgs,
+                           "-- invalid or missing parameter");
           }
 
           return cmd;
@@ -299,9 +283,6 @@ module.exports = function(grunt) {
 
           return cmd;
         }
-      },
-      'fh-nsp': {
-        command: 'PATH=node_modules/.bin:node_modules/grunt-fh-build/node_modules/.bin:$PATH nsp check'
       }
     }
   });
@@ -311,14 +292,13 @@ module.exports = function(grunt) {
     try {
       require(path.resolve('config/ose-placeholders.js'));
       return true;
-    }
-    catch (exception) {
+    } catch (exception) {
       grunt.log.debug('No placeholder file found for openshift 3 - continuing normally');
       return false;
     }
   };
 
-  var runTestsForSingleFile = function (args) {
+  var runTestsForSingleFile = function(args) {
     var testFile = args[0];
     if (!testFile) {
       grunt.log.errorlns("Please specify test file to run: grunt fh:testfile:filename.js");
@@ -344,9 +324,9 @@ module.exports = function(grunt) {
     var placeholders = require(path.resolve('config/ose-placeholders.js'));
 
     grunt.log.debug('Generating openshift 3 config file');
-    _ld.forOwn(placeholders, function(value, key) {
+    _.forOwn(placeholders, function(value, key) {
       grunt.log.debug('key', key, 'value', value);
-      _ld.set(conf, key, value);
+      _.set(conf, key, value);
     });
     fs.writeFileSync('conf-docker.json', JSON.stringify(conf, true, 2));
     grunt.log.debug('Created file conf-docker.json');
@@ -391,7 +371,7 @@ module.exports = function(grunt) {
                       'shell:fh-run-array:accept']);
     } else if (this.target === 'unit') {
       grunt.task.run(['shell:fh-run-array:unit']);
-    } else if (this.target === 'testfile'){
+    } else if (this.target === 'testfile') {
       runTestsForSingleFile(arguments);
     } else if (this.target === 'integrate') {
       grunt.task.run(['shell:fh-run-array:integrate']);
@@ -403,14 +383,37 @@ module.exports = function(grunt) {
         'shell:fh-run-array:integrate_cover', 'shell:fh-run-array:accept_cover',
         'shell:fh-report-cov:lcov', 'shell:fh-report-cov:cobertura'
       ]);
-    } else if (this.target === 'analysis') {
-      grunt.task.run(['plato:fh']);
-    } else if (this.target === 'shrinkwrap') {
-      grunt.task.run(['shell:fh-run-array:fhshrinkwrap']);
     } else if (this.target === 'default') {
-      grunt.task.run(['jshint', 'fh:test', 'fh:dist']);
+      grunt.task.run(['eslint', 'fh:test', 'fh:dist']);
     } else {
       grunt.fail.warn('Unknown target provided to `grunt fh`');
     }
   });
+
+  grunt.registerTask('fh-dist',
+                     'Create two tarballs in ./dist/: with and without node_modules directory',
+                     ['fh:dist']);
+  grunt.registerTask('fh-clean',
+                     'Clean up files generated by grunt-fh-build',
+                     ['fh:clean']);
+  grunt.registerTask('fh-unit',
+                     'Run array of commands defined as "unit" in Gruntfile.js',
+                     ['fh:unit']);
+  grunt.registerTask('fh-integrate',
+                     'Run array of commands defined as "integrate" in Gruntfile.js',
+                     ['fh:integrate']);
+  grunt.registerTask('fh-accept',
+                     'Run array of commands defined as "accept" in Gruntfile.js',
+                     ['fh:accept']);
+  grunt.registerTask('fh-test',
+                     'Run all configured unit, integration, and acceptance tests',
+                     ['fh:test']);
+  grunt.registerTask('fh-coverage',
+                     'Run all configured tests and compute code coverage',
+                     ['fh:coverage']);
+  grunt.registerTask('fh-default',
+                     'The default set of tasks that should be run during CI builds. ' +
+                     'Currently runs: eslint, fh-test, and fh-dist',
+                     ['fh:default']);
+
 };
