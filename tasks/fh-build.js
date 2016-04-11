@@ -59,6 +59,7 @@ module.exports = function(grunt) {
       '!makefile',
       '!npm-debug.log',
       '!*.sublime-project',
+      '!sonar-project.properties',
       '!**/*.tar.gz'
     ];
     if (bundle_deps) {
