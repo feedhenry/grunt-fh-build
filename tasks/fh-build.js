@@ -260,9 +260,8 @@ module.exports = function(grunt) {
           var cmd = '';
 
           if (test_type && grunt.config.get(test_type)) {
-            var cmdsString = grunt.config.get(test_type);
-            var cmdArray = cmdsString.split(',');
-            cmd = cmdArray.join(' && ');
+            var cmds = grunt.config.get(test_type);
+            cmd = typeof cmds === 'string' ? cmds : cmds.join(' && ');
           } else {
             grunt.log.warn("Skipping", grunt.task.current.nameArgs,
                            "-- invalid or missing parameter");
