@@ -72,16 +72,16 @@ module.exports = function(grunt) {
 
     var fhignore = grunt.config.get('fhignore');
     var extras = [];
-    if (typeof fhignore === 'string' && fhignore.length > 0) {
-      extras = fhignore.split(',').map(function(elem) {
+    if (fhignore && _.isArray(fhignore)) {
+      extras = fhignore.map(function(elem) {
         return '!' + elem;
       });
     }
     Array.prototype.push.apply(patterns, extras);
     var fhinclude = grunt.config.get('fhinclude');
     extras = [];
-    if(typeof fhinclude === 'string' && fhinclude.length > 0) {
-      extras = fhinclude.split(',');
+    if(fhinclude && _.isArray(fhinclude)) {
+      extras = fhinclude;
     }
     Array.prototype.push.apply(patterns, extras);
     grunt.log.debug("Patterns: " + patterns);
