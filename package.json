@@ -13,7 +13,7 @@
     "url": "https://github.com/feedhenry/grunt-fh-build/issues"
   },
   "engines": {
-    "node": ">= 0.10.0"
+    "node": "4.4"
   },
   "scripts": {
     "test": "grunt eslint",
