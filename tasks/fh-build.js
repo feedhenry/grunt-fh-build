@@ -63,11 +63,11 @@ module.exports = function(grunt) {
       '!**/*.tar.gz'
     ];
     if (bundle_deps) {
-      _.map(_.keys(grunt.file.readJSON('package.json').dependencies),
-            function(dep) {
-              patterns.push('node_modules/' + dep + '/**');
-              return dep;
-            });
+      _.map(fs.readdirSync('node_modules'),
+        function(dep) {
+          patterns.push('node_modules/' + dep + '/**');
+          return dep;
+        });
     }
 
     var fhignore = grunt.config.get('fhignore');
