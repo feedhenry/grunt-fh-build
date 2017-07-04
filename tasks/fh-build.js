@@ -66,8 +66,7 @@ module.exports = function(grunt) {
     clean: {
       'fh-cov': ['coverage', 'lib-cov', 'cov-*'],
       'fh-dist': ['dist', 'output'],
-      'fh-main': ['lib-cov', 'cov-*', 'coverage', '.tmp'],
-      'fh-pack': ['<%= archiveName %>']
+      'fh-main': ['lib-cov', 'cov-*', 'coverage', '.tmp']
     }
   });
 
@@ -147,6 +146,11 @@ module.exports = function(grunt) {
             }
 
             grunt.config.set('archiveName', stdout.trim());
+            grunt.config.merge({
+              clean: {
+                'fh-pack': ['<%= archiveName %>']
+              }
+            });
             return cb();
           }
         }
