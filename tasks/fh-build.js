@@ -66,7 +66,12 @@ module.exports = function(grunt) {
     clean: {
       'fh-cov': ['coverage', 'lib-cov', 'cov-*'],
       'fh-dist': ['dist', 'output'],
-      'fh-main': ['lib-cov', 'cov-*', 'coverage', '.tmp'],
+      'fh-main': ['lib-cov', 'cov-*', 'coverage', '.tmp']
+    }
+  });
+
+  grunt.config.merge({
+    teardown: {
       'fh-pack': ['<%= archiveName %>']
     }
   });
@@ -276,7 +281,7 @@ module.exports = function(grunt) {
         grunt.task.run('copy:archiveWithDeps');
       }
 
-      grunt.task.run('clean:fh-pack');
+      grunt.task.run('teardown:fh-pack');
     } else if (this.target === 'make-version-file') {
       grunt.file.write('output/' + grunt.config('fhbuildver') + '/VERSION.txt',
                        grunt.config('fhbuildver') + '\n');
