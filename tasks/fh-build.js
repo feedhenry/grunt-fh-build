@@ -38,56 +38,6 @@ module.exports = function(grunt) {
     }
   }
 
-  /**
-   * If grunt config contains an array property called 'fhignore',
-   * its elements will be excluded from the tarball.
-   */
-  var mergePatterns = function(bundle_deps) {
-    var patterns = [
-      '**',
-      '!dist/**',
-      '!plato/**',
-      '!cov-*/**',
-      '!test*/**',
-      '!config/**',
-      '!output/**',
-      '!coverage/**',
-      '!node_modules/**',
-      '!package.json', // this will be processed
-      '!Gruntfile.js',
-      '!Makefile',
-      '!makefile',
-      '!npm-debug.log',
-      '!*.sublime-project',
-      '!sonar-project.properties',
-      '!**/*.tar.gz'
-    ];
-    if (bundle_deps) {
-      _.map(_.keys(grunt.file.readJSON('package.json').dependencies),
-            function(dep) {
-              patterns.push('node_modules/' + dep + '/**');
-              return dep;
-            });
-    }
-
-    var fhignore = grunt.config.get('fhignore');
-    var extras = [];
-    if (fhignore && _.isArray(fhignore)) {
-      extras = fhignore.map(function(elem) {
-        return '!' + elem;
-      });
-    }
-    Array.prototype.push.apply(patterns, extras);
-    var fhinclude = grunt.config.get('fhinclude');
-    extras = [];
-    if(fhinclude && _.isArray(fhinclude)) {
-      extras = fhinclude;
-    }
-    Array.prototype.push.apply(patterns, extras);
-    grunt.log.debug("Patterns: " + patterns);
-    return patterns;
-  };
-
   grunt.config.merge({
     env: {
       fh: {
@@ -121,64 +71,20 @@ module.exports = function(grunt) {
   });
 
   grunt.config.merge({
-    copy: {
-      'fh-dist': {
-        src: 'package.json',
-        dest: 'output/<%= fhbuildver %>/package.json',
-        options: {
-          process: function(content) {
-            return content.replace(/BUILD\-NUMBER/,
-                                   grunt.config.get('fhbuildnum'));
-          }
-        }
-      }
+    teardown: {
+      'fh-pack': ['<%= archiveName %>']
     }
   });
 
   grunt.config.merge({
-    compress: {
-      'fh-dist': {
-        options: {
-          mode: 'tgz',
-          archive: 'dist/<%= fhpkg.name %>-<%= fhbuildver %>.tar.gz'
-        },
-        files: [
-          {
-            // Everything except exclusions
-            expand: true,
-            src: mergePatterns(false),
-            dest: '<%= fhpkg.name %>-<%= fhbuildver %>'
-          },
-          {
-            // Files that are processed
-            expand: true,
-            cwd: 'output/<%= fhbuildver %>/',
-            src: ['*'],
-            dest: '<%= fhpkg.name %>-<%= fhbuildver %>'
-          }
-        ]
+    copy: {
+      'archive': {
+        src: '<%= archiveName %>',
+        dest: 'dist/<%= fhpkg.name %>-<%= fhbuildver %>.tar.gz'
       },
-      'fh-dist-deps': {
-        options: {
-          mode: 'tgz',
-          archive: 'dist/<%= fhpkg.name %>-<%= fhbuildver %>-<%= fhos %>.'
-            + process.arch + '.tar.gz'
-        },
-        files: [
-          {
-            // Everything except exclusions
-            expand: 'true',
-            src: mergePatterns(true),
-            dest: '<%= fhpkg.name %>-<%= fhbuildver %>-<%= fhos %>.' + process.arch
-          },
-          {
-            // Files that are processed
-            expand: true,
-            cwd: 'output/<%= fhbuildver %>/',
-            src: ['*'],
-            dest: '<%= fhpkg.name %>-<%= fhbuildver %>-<%= fhos %>.' + process.arch
-          }
-        ]
+      'archiveWithDeps': {
+        src: '<%= archiveName %>',
+        dest: 'dist/<%= fhpkg.name %>-<%= fhbuildver %>-<%= fhos %>.' + process.arch + '.tar.gz'
       }
     }
   });
@@ -232,6 +138,20 @@ module.exports = function(grunt) {
               return cb();
             }
             grunt.config.set('fhos', stdout.slice(1).trim());
+            return cb();
+          }
+        }
+      },
+
+      'pack': {
+        command: 'npm pack',
+        options: {
+          callback: function(err, stdout, stderr, cb) {
+            if (err || stderr) {
+              throw err || stderr;
+            }
+
+            grunt.config.set('archiveName', stdout.trim());
             return cb();
           }
         }
@@ -343,14 +263,14 @@ module.exports = function(grunt) {
     grunt.task.run('env:fh');
 
     if (this.target === 'dist') {
-      grunt.task.run(['clean:fh-dist', 'fh:make-version-file', 'copy:fh-dist']);
+      grunt.task.run(['clean:fh-dist', 'fh:make-version-file', 'shell:pack']);
 
       if (checkPlaceholderFileExists()) {
         grunt.task.run('fh-generate-dockerised-config');
       }
 
       if (!grunt.option('only-bundle-deps')) {
-        grunt.task.run('compress:fh-dist');
+        grunt.task.run('copy:archive');
       }
       if (!grunt.option('no-bundle-deps')) {
         if (process.platform === 'linux') {
@@ -358,8 +278,10 @@ module.exports = function(grunt) {
         } else {
           grunt.config.set('fhos', process.platform);
         }
-        grunt.task.run('compress:fh-dist-deps');
+        grunt.task.run('copy:archiveWithDeps');
       }
+
+      grunt.task.run('teardown:fh-pack');
     } else if (this.target === 'make-version-file') {
       grunt.file.write('output/' + grunt.config('fhbuildver') + '/VERSION.txt',
                        grunt.config('fhbuildver') + '\n');
