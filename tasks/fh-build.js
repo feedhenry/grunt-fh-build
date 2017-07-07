@@ -17,6 +17,7 @@ var path = require('path');
 var findup = require('findup-sync');
 var _ = require('lodash');
 var fs = require('fs');
+var exec = require('child_process').execSync;
 
 
 module.exports = function(grunt) {
@@ -63,13 +64,17 @@ module.exports = function(grunt) {
       '!**/*.tar.gz'
     ];
     if (bundle_deps) {
-      _.map(_.keys(grunt.file.readJSON('package.json').dependencies),
-            function(dep) {
-              patterns.push('node_modules/' + dep + '/**');
-              return dep;
-            });
+      exec('npm ls --parseable --production').toString().split('\n').forEach(function(path) {
+        var pathParts = path.split('/');
+        var nodeModules = pathParts.indexOf('node_modules');
+        if(nodeModules >= 0 && nodeModules + 1 < pathParts.length) {
+          var parsedPath = [pathParts[nodeModules], pathParts[nodeModules + 1]].join('/') + '/**';
+          if(patterns.indexOf(parsedPath) < 0) {
+            patterns.push(parsedPath);
+          }
+        }
+      });
     }
-
     var fhignore = grunt.config.get('fhignore');
     var extras = [];
     if (fhignore && _.isArray(fhignore)) {
