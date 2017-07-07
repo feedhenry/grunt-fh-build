@@ -40,6 +40,23 @@ module.exports = function(grunt) {
   }
 
   /**
+   * Keep just the first occurence of `node_modules` and the directory name next to it, and append `**`
+   * e.g. /home/user/work/fh-ngui/node_modules/watchify/node_modules/assert will be formatted  to node_modules/watchify/**
+   */
+  var formatDirectory = function(dir) {
+    var dirParts = dir.split(path.sep);
+    var nodeModules = dirParts.indexOf('node_modules');
+    return path.join(dirParts[nodeModules], dirParts[nodeModules + 1], '**');
+  };
+
+  /**
+   * Check if `node_modules` exists in a directory path
+   */
+  var nodeModulesExists = function(dir) {
+    return dir.indexOf('node_modules') >= 0;
+  };
+
+  /**
    * If grunt config contains an array property called 'fhignore',
    * its elements will be excluded from the tarball.
    */
@@ -64,16 +81,14 @@ module.exports = function(grunt) {
       '!**/*.tar.gz'
     ];
     if (bundle_deps) {
-      exec('npm ls --parseable --production').toString().split('\n').forEach(function(path) {
-        var pathParts = path.split('/');
-        var nodeModules = pathParts.indexOf('node_modules');
-        if(nodeModules >= 0 && nodeModules + 1 < pathParts.length) {
-          var parsedPath = [pathParts[nodeModules], pathParts[nodeModules + 1]].join('/') + '/**';
-          if(patterns.indexOf(parsedPath) < 0) {
-            patterns.push(parsedPath);
-          }
-        }
-      });
+      patterns = patterns.concat(
+        //child_process' execSync's default maxBuffer is 200kb, modify if needed
+        _.uniq(exec('npm ls --parseable --production')
+          .toString()
+          .split('\n')
+          .filter(nodeModulesExists)
+          .map(formatDirectory))
+      );
     }
     var fhignore = grunt.config.get('fhignore');
     var extras = [];
