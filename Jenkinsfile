@@ -3,6 +3,8 @@
 // https://github.com/feedhenry/fh-pipeline-library
 @Library('fh-pipeline-library') _
 
+println 'Wooooooooooooooooooooooooooooooooooooooooooooooooo'
+
 node('nodejs6') {
 
     step([$class: 'WsCleanup'])
