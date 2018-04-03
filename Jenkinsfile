@@ -1,27 +1,48 @@
-#!groovy
-
 // https://github.com/feedhenry/fh-pipeline-library
 @Library('fh-pipeline-library') _
 
-node('nodejs6') {
+pipeline {
 
-    step([$class: 'WsCleanup'])
-
-    stage ('Checkout') {
-        checkout scm
+    agent {
+        node {
+            label 'nodejs6'
+        }
     }
 
-    stage('Install Dependencies') {
-        npmInstall {}
-    }
+    stages {
+        stage('Trust') {
+            steps {
+                enforceTrustedApproval()
+            }
+        }
 
-    stage('Lint') {
-        sh 'grunt eslint'
-    }
+        stage('Checkout') {
+            steps {
+                cleanWs()
+                checkout scm
+            }
+        }
 
-    stage('Build') {
-        gruntBuild {
-            name = 'grunt-fh-build'
+        stage('Install Dependencies') {
+            steps {
+                npmInstall {}
+            }
+        }
+
+        stage('Lint') {
+            steps {
+                sh 'grunt eslint'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    gruntBuild {
+                        name = 'grunt-fh-build'
+                    }
+                }
+            }
         }
     }
 }
